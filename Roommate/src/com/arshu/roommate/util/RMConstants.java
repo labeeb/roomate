@@ -9,7 +9,33 @@ public class RMConstants {
 		ADDUSER, LISTROOM
 	}
 	
-	public static enum UserType{
-		ADMIN, NORMAL
+	public static enum UserType {
+		ADMIN(1), NORMAL(2);
+
+		private final int value;
+
+		UserType(int value) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return value;
+		}
+		
+		public static UserType getUserType(int value){
+			switch (value) {
+			case 1:
+				return ADMIN;
+
+			default:
+				return NORMAL;
+			}
+			
+		}
 	}
+	
+	public static final String BK_LOGGED_MATE= "BK_LOGGED_MATE"; //BK = Bundle Key
+	
+	
+	public static final String TAG = "RM";
 }

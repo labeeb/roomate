@@ -30,7 +30,6 @@ public class RMAddRoomViewHelper implements RMViewHelper{
 	@Override
 	public Fragment getFragment(RMBaseActivity activity) {
 		Fragment fragment = new AddRoomFragment();
-		fragment.setArguments(new Bundle());
 		return fragment;
 	}
 	

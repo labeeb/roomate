@@ -1,95 +1,86 @@
-//package com.arshu.roommate.parse;
-//
-//import java.util.List;
-//
-//import com.arshu.roommate.exception.RMException;
-//import com.arshu.roommate.util.RMConstants.TaskStatus;
-//import com.parse.FindCallback;
-//import com.parse.ParseException;
-//import com.parse.ParseObject;
-//import com.parse.ParseQuery;
-//import com.parse.SaveCallback;
-//
-//public class Room implements RMParseObject {
-//	
-//	private static final String NAME= "name";
-//	private String name; 
-//	
-//	private static final String DESCRIPTION= "description";
-//	private String description;
-//	
-//	private static final String TYPE= "type";
-//	private int type; 
-//	
-//	public Room(String name, String description) {
-//		super();
-//		this.name = name;
-//		this.description = description;
-//		this.type = 0;
-//	}
-//	
-//	public Room() {}
-//	
-//	@Override
-//	public ParseObject getParseObject() {
-//		ParseObject testObject = new ParseObject(this.getClass().getSimpleName());
-//		testObject.put(NAME, name);
-//		testObject.put(DESCRIPTION, description);
-//		testObject.put(TYPE, type);
-//		return testObject;
-//	}
-//	
-//	@Override
-//	public RMParseObject getObject(ParseObject parseObject) {
-//		Room mate = new Room();
-//		mate.name = parseObject.getString(NAME);
-//		mate.description = parseObject.getString(DESCRIPTION);
-//		mate.type = parseObject.getInt(TYPE);
-//		return mate;
-//	}
-//	
-//	@Override
-//	public void saveInBackground(final TaskCompleteCallBack callback) {
-//		getParseObject().saveEventually(new SaveCallback() {
-//			
-//			@Override
-//			public void done(ParseException e) {
-//				if(e== null){
-//					callback.onComplete(TaskStatus.SCUCCESS, null);
-//				}else{
-//					callback.onComplete(TaskStatus.FAILURE, new RMException(e));
-//				}
-//			}
-//		});
-//		
-//	}
-//	
-//	public void checkUser(final String name,final LoginCallBack callback){
-//		ParseQuery<ParseObject> query = ParseQuery.getQuery(this.getClass().getSimpleName());
-//		query.whereEqualTo(NAME, name);
-//		query.findInBackground(new FindCallback<ParseObject>() {
-//		    public void done(List<ParseObject> scoreList, ParseException e) {
-//		        if (e == null&& scoreList != null && scoreList.size() > 0) {
-//		        	Room mate = (Room) getObject(scoreList.get(0));
-//		        	callback.onSuccess(mate);
-//		        } else {
-//		        	if(e != null){
-//		        		callback.onError(new RMException(e));
-//		        	}else{
-//		        		callback.onError(new RMException("No such user "));
-//		        	}
-//		        	
-//		        }
-//		    }
-//		});
-//	}
-//	
-//	
-//	public interface LoginCallBack{
-//		public void onSuccess(Room mate);
-//		public void onError(RMException exception);
-//		
-//	}
-//	
-//	
-//}
+package com.arshu.roommate.parse;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.parse.ParseObject;
+
+public class Room extends RMBaseValueObject {
+	
+	private static final String NAME= "name";
+	private String name; 
+	
+	private static final String DESCRIPTION= "description";
+	private String description;
+	
+	private static final String CREATEDMATEOBJECT= "createdMateObject";
+	private ParseObject createdMateObject;
+	
+	private static final String TYPE= "type";
+	private int type; 
+	
+	public Room(String name, String description,ParseObject createdMateObject) {
+		super();
+		this.name = name;
+		this.description = description;
+		this.type = 0;
+		this.createdMateObject = createdMateObject;
+	}
+	
+	public Room() {}
+	
+	@Override
+	public void createParseObject() {
+		parseObject = new ParseObject(this.getClass().getSimpleName());
+		parseObject.put(NAME, name);
+		parseObject.put(DESCRIPTION, description);
+		parseObject.put(CREATEDMATEOBJECT, createdMateObject);
+		parseObject.put(TYPE, type);
+	}
+	
+	@Override
+	protected void loadChildValues(ParseObject parseObject) {
+		this.name = parseObject.getString(NAME);
+		this.description = parseObject.getString(DESCRIPTION);
+		this.createdMateObject = parseObject.getParseObject(CREATEDMATEOBJECT);
+		this.type = parseObject.getInt(TYPE);
+	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
+	
+	/*
+	 * For Parcelable 	
+	 */
+	
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		super.writeParentToParcel(dest);
+		dest.writeString(name);
+		dest.writeString(description);
+		saveParseObject(dest, createdMateObject);
+		dest.writeInt(type);
+	}
+	private Room(Parcel in) {
+		super.readParent(in);
+		name = in.readString();
+		description = in.readString();
+		createdMateObject = readPaseObject(in);
+		type = in.readInt();
+	}
+
+	public static final Parcelable.Creator<Room> CREATOR = new Parcelable.Creator<Room>() {
+		public Room createFromParcel(Parcel in) {
+			return new Room(in);
+		}
+
+		public Room[] newArray(int size) {
+			return new Room[size];
+		}
+	};
+
+	
+}

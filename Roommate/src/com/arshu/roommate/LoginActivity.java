@@ -18,19 +18,15 @@ import android.widget.TextView;
 import com.arshu.roommate.exception.RMException;
 import com.arshu.roommate.parse.Mate;
 import com.arshu.roommate.parse.TaskCompleteCallBack;
+import com.arshu.roommate.util.RMConstants;
 import com.arshu.roommate.util.RMConstants.TaskStatus;
+import com.parse.ParseObject;
 
 /**
  * Activity which displays a login screen to the user, offering registration as
  * well.
  */
 public class LoginActivity extends Activity {
-	/**
-	 * A dummy authentication store containing known user names and passwords.
-	 * TODO: remove after connecting to a real authentication system.
-	 */
-	private static final String[] DUMMY_CREDENTIALS = new String[] {
-			"foo@example.com:hello", "bar@example.com:world" };
 
 	/**
 	 * The default email to populate the email field with.
@@ -93,6 +89,11 @@ public class LoginActivity extends Activity {
 						attemptLogin(true);
 					}
 				});
+		
+		
+		//TODO for testing only, need to remove
+		mEmailView.setText("qq@qq.qq");
+		mPasswordView.setText("123456");
 	}
 
 	@Override
@@ -156,7 +157,8 @@ public class LoginActivity extends Activity {
 				mate.saveInBackground(new TaskCompleteCallBack() {
 					
 					@Override
-					public void onComplete(TaskStatus status, RMException exception) {
+					public void onComplete(TaskStatus status, ParseObject objectId,
+							RMException exception) {
 						// TODO Auto-generated method stub
 						
 					}
@@ -171,7 +173,9 @@ public class LoginActivity extends Activity {
 					@Override
 					public void onSuccess(Mate mate) {
 						showProgress(false);
-						startActivity(new Intent(LoginActivity.this,HomeActivity.class));
+						Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
+						intent.putExtra(RMConstants.BK_LOGGED_MATE, mate);
+						startActivity(intent);
 					}
 					
 					@Override
@@ -181,44 +185,8 @@ public class LoginActivity extends Activity {
 							.setError(getString(R.string.error_incorrect_password));
 					}
 				});
-//				ParseQuery<ParseObject> query = ParseQuery.getQuery("Mate");
-//				query.whereEqualTo("email", mEmail);
-//				query.whereEqualTo("password", mPassword);
-//				query.findInBackground(new FindCallback<ParseObject>() {
-//				    public void done(List<ParseObject> scoreList, ParseException e) {
-//				    	showProgress(false);
-//				        if (e == null && null != scoreList && scoreList.size() > 0 ) {
-//				        	startActivity(new Intent(LoginActivity.this,HomeActivity.class));
-//				        } else {
-//				            Log.d("score", "Error: " + e);
-//				            mPasswordView
-//							.setError(getString(R.string.error_incorrect_password));
-//					mPasswordView.requestFocus();
-//				        }
-//				    }
-//				});
-				
-				
-//				Mate mate = new Mate("test", mEmail, mPassword, 1);
-//				mate.getParseObject().fetchInBackground(new GetCallback<ParseObject>() {
-//					  public void done(ParseObject object, ParseException e) {
-//						  showProgress(false);
-//					    if (e == null) {
-//					    	startActivity(new Intent(LoginActivity.this,HomeActivity.class));
-//					    } else {
-//					    	mPasswordView
-//							.setError(getString(R.string.error_incorrect_password));
-//					mPasswordView.requestFocus();
-//					    }
-//					  }
-//					});
-//				
-				
-				
 			}
 			
-			//mAuthTask = new UserLoginTask(isRegister);
-			//mAuthTask.execute((Void) null);
 		}
 	}
 

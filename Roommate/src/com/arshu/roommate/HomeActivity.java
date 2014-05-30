@@ -10,6 +10,9 @@ import android.view.MenuItem;
 
 import com.arshu.roommate.fragment.NavigationDrawerFragment;
 import com.arshu.roommate.fragment.RoomListFragment;
+import com.arshu.roommate.parse.Mate;
+import com.arshu.roommate.util.RMConstants;
+import com.arshu.roommate.util.RMLog;
 import com.arshu.roommate.viewhelper.RMViewManager;
 import com.arshu.roommate.vo.DrawerItem;
 
@@ -30,6 +33,10 @@ public class HomeActivity extends RMBaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        
+       
+       
+        
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -45,17 +52,25 @@ public class HomeActivity extends RMBaseActivity
     
     @Override
     public void onNavigationDrawerItemSelected(DrawerItem item) {
+    	 
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
         if(null == item){ //No item selected, that means default page 
         	Fragment fragment = new RoomListFragment();
-    		fragment.setArguments(new Bundle());
+        	Bundle bundle = new Bundle();
+        	bundle.putParcelable(RMConstants.BK_LOGGED_MATE, getLoggedMate());
+    		fragment.setArguments(bundle);
         	fragmentManager.beginTransaction()
             .replace(R.id.container, fragment)
             .commit();
         }else{
+        	Fragment fragment = RMViewManager.getViewHelper(item).getFragment(this);
+        	Bundle bundle = new Bundle();
+        	bundle.putParcelable(RMConstants.BK_LOGGED_MATE, getLoggedMate());
+        	fragment.setArguments(bundle);
+        	
         	fragmentManager.beginTransaction()
-            .replace(R.id.container, RMViewManager.getViewHelper(item).getFragment(this))
+            .replace(R.id.container, fragment)
             .commit();
         }
         

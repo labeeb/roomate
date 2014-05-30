@@ -2,15 +2,16 @@ package com.arshu.roommate.parse;
 
 import java.util.List;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.arshu.roommate.exception.RMException;
-import com.arshu.roommate.util.RMConstants.TaskStatus;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.SaveCallback;
 
-public class Mate extends RMParseObject {
+public class Mate extends RMBaseValueObject {
 	
 	private static final String NAME= "name";
 	private String name; 
@@ -34,14 +35,45 @@ public class Mate extends RMParseObject {
 	
 	public Mate() {}
 	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
 	@Override
-	public ParseObject getParseObject() {
+	public void createParseObject() {
 		ParseObject testObject = new ParseObject(this.getClass().getSimpleName());
 		testObject.put(NAME, name);
 		testObject.put(EMAIL, email);
 		testObject.put(PASSWORD, password);
 		testObject.put(TYPE, type);
-		return testObject;
 	}
 	
 	@Override
@@ -52,22 +84,6 @@ public class Mate extends RMParseObject {
 		this.type = parseObject.getInt(TYPE);
 	}
 	
-	
-	@Override
-	public void saveInBackground(final TaskCompleteCallBack callback) {
-		getParseObject().saveEventually(new SaveCallback() {
-			
-			@Override
-			public void done(ParseException e) {
-				if(e== null){
-					callback.onComplete(TaskStatus.SCUCCESS, null);
-				}else{
-					callback.onComplete(TaskStatus.FAILURE, new RMException(e));
-				}
-			}
-		});
-		
-	}
 	
 	public void checkUser(final String email,final String password,final LoginCallBack callback){
 		ParseQuery<ParseObject> query = ParseQuery.getQuery(this.getClass().getSimpleName());
@@ -96,6 +112,37 @@ public class Mate extends RMParseObject {
 		public void onError(RMException exception);
 		
 	}
+
 	
+
 	
+/*
+ * For Parcelable 	
+ */
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		super.writeParentToParcel(dest);
+		dest.writeString(name);
+		dest.writeString(email);
+		dest.writeString(password);
+		dest.writeInt(type);
+	}
+	private Mate(Parcel in) {
+		super.readParent(in);
+		name = in.readString();
+		email = in.readString();
+		password = in.readString();
+		type = in.readInt();
+	}
+
+	public static final Parcelable.Creator<Mate> CREATOR = new Parcelable.Creator<Mate>() {
+		public Mate createFromParcel(Parcel in) {
+			return new Mate(in);
+		}
+
+		public Mate[] newArray(int size) {
+			return new Mate[size];
+		}
+	};
 }
